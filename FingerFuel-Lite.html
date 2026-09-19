@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<!-- saved from url=(0016)http://localhost -->
+<html lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>FingerFuel Lite - offline typing test</title>
+<style type="text/css">
+html,body{margin:0;padding:0}
+body{background:#26332f;color:#e9eee9;font-family:Tahoma,Arial,sans-serif;font-size:15px}
+a{color:#9db0a8}
+button{font-family:Tahoma,Arial,sans-serif;font-size:14px}
+input,select{font-family:Tahoma,Arial,sans-serif;font-size:14px}
+#page{width:90%;max-width:860px;margin:0 auto;padding:18px 0 24px}
+#top{overflow:hidden;zoom:1}
+#logo{float:left;font-size:24px;font-weight:bold;color:#f0d264}
+#logo span{font-size:13px;font-weight:normal;color:#7f948c;margin-left:8px}
+#who{float:right;padding-top:8px;color:#7f948c}
+#who b{color:#f0d264}
+#pEditRow{clear:both;text-align:right;padding-top:6px}
+#cfg{clear:both;margin:16px 0 0;padding:6px 4px;text-align:center;background:#2f3e39}
+#cfg span.sep{color:#55665f;padding:0 4px}
+.opt{background:#2f3e39;border:0;color:#9db0a8;padding:6px 10px;cursor:pointer}
+.opt.on{color:#f0d264;font-weight:bold}
+#topic{background:#26332f;color:#e9eee9;border:1px solid #7f948c}
+#stage{margin-top:34px}
+#noteTitle{height:24px;color:#7f948c}
+#live{height:32px;font-size:24px;color:#f0d264;visibility:hidden;font-family:"Lucida Console","Courier New",monospace}
+#live span{margin-right:24px}
+#box{position:relative;height:108px;overflow:hidden;font-family:"Lucida Console","Courier New",monospace;font-size:24px;line-height:36px;color:#7f948c}
+#words{position:relative}
+.w{padding:0}
+.cw{border-bottom:2px solid #7f948c}
+.bad{border-bottom:2px solid #ee7b6e}
+.c{color:#e9eee9}
+.x{color:#ee7b6e}
+.e{color:#b4574d}
+.cl{background:#f0d264;color:#26332f}
+#warn{height:24px;margin-top:12px;text-align:center;color:#ee7b6e}
+#hint{text-align:center;color:#7f948c;font-size:13px;line-height:22px}
+.hide{display:none!important}
+.stat{display:inline-block;*display:inline;zoom:1;vertical-align:top;margin:0 34px 14px 0}
+.stat .lbl{color:#7f948c;font-size:14px}
+.stat .val{font-family:"Lucida Console","Courier New",monospace;font-size:24px}
+.stat .big{color:#f0d264;font-size:64px;line-height:64px}
+#best{min-height:22px;margin:4px 0 8px}
+#nameBox{background:#2f3e39;padding:10px 14px;margin:8px 0}
+#nameBox b{color:#f0d264}
+#recap{background:#2f3e39;padding:10px 14px;margin:8px 0;line-height:24px}
+#recap b{color:#f0d264}
+.btn{background:#2f3e39;border:1px solid #55665f;color:#e9eee9;padding:8px 16px;cursor:pointer;margin:6px 8px 0 0}
+.btn.pri{background:#f0d264;border-color:#f0d264;color:#26332f;font-weight:bold}
+#scores{margin-top:8px}
+#scores .row{padding:5px 0;border-bottom:1px solid #2f3e39}
+#scores .row b{color:#f0d264;font-family:"Lucida Console","Courier New",monospace}
+#foot{margin-top:40px;text-align:center;color:#7f948c;font-size:13px;line-height:24px}
+@media (max-width:600px){#box{font-size:18px}.stat .big{font-size:48px}}
+</style>
+</head>
+<body>
+<noscript><p style="padding:20px">FingerFuel needs JavaScript. Please enable scripts in your browser.</p></noscript>
+<div id="page">
+  <div id="top">
+    <div id="logo">FingerFuel<span>Lite, works offline</span></div>
+    <div id="who">Player: <b id="pName">guest</b> [<a href="#" id="pChg">change</a>] [<a href="#" id="scoreLnk">scores</a>]</div>
+    <div id="pEditRow" class="hide"><input id="pIn" type="text" maxlength="20"> <button type="button" id="pOk" class="btn" style="margin:0">Save name</button></div>
+  </div>
+
+  <div id="cfg">
+    <button type="button" class="opt" id="m_time">time</button><button type="button" class="opt" id="m_words">words</button><button type="button" class="opt" id="m_notes">notes</button>
+    <span class="sep">|</span>
+    <span id="amounts"></span><select id="topic" class="hide"></select>
+  </div>
+
+  <div id="stage">
+    <div id="test">
+      <div id="noteTitle" class="hide"></div>
+      <div id="live"><span id="liveA"></span><span id="liveB"></span></div>
+      <div id="box"><div id="words"></div></div>
+      <div id="warn"></div>
+      <div id="hint">Just start typing. <b>Tab</b> = new test, <b>Esc</b> = same words again, <b>Ctrl+Backspace</b> = delete a word.</div>
+    </div>
+
+    <div id="res" class="hide">
+      <div class="stat"><div class="lbl">wpm</div><div class="val big" id="rWpm"></div></div>
+      <div class="stat"><div class="lbl">accuracy</div><div class="val big" id="rAcc"></div></div>
+      <div>
+        <div class="stat"><div class="lbl">raw speed</div><div class="val" id="rRaw"></div></div>
+        <div class="stat"><div class="lbl">characters (correct / wrong / extra / missed)</div><div class="val" id="rChars"></div></div>
+        <div class="stat"><div class="lbl">time</div><div class="val" id="rTime"></div></div>
+        <div class="stat"><div class="lbl">test</div><div class="val" id="rMode"></div></div>
+      </div>
+      <div id="best"></div>
+      <div id="nameBox" class="hide"><b>New high score!</b> Type your name to save it with the score:<br>
+        <input id="nameIn" type="text" maxlength="20"> <button type="button" id="nameSave" class="btn" style="margin:0">Save name</button></div>
+      <div id="recap" class="hide"><b id="recapTitle"></b><br><span id="recapText"></span></div>
+      <div><button type="button" class="btn pri" id="btnNext">Next test</button><button type="button" class="btn" id="btnRetry">Retry same words</button></div>
+    </div>
+
+    <div id="scores" class="hide">
+      <h3 style="margin:0 0 8px;font-weight:normal;color:#f0d264">High scores on this computer</h3>
+      <div id="scoreRows"></div>
+      <div><button type="button" class="btn" id="scoreClear">Clear all scores</button><button type="button" class="btn pri" id="scoreClose">Close</button></div>
+    </div>
+  </div>
+
+  <div id="foot">
+    <div>Saved scores stay on this computer.</div>
+    <div><a href="https://github.com/animeshmahat" target="_blank">github.com/animeshmahat</a></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+/* FingerFuel Lite: plain old JavaScript (ES3) so it runs in Internet Explorer 8 and newer. */
+(function () {
+
+  /* NOTES for "notes" mode. To add your own, copy a line and edit it:
+     [ "Topic", "Title", "Text students will type" ],
+     Keep the same topic names to keep them grouped. Use plain English letters and punctuation. */
+  var NOTE_CATS = ['Basics', 'Hardware', 'Software', 'Internet and safety', 'Office tools', 'Logic and coding', 'Typing and health'];
+  var NOTES = [
+    ["Basics", "What is a computer?", "A computer is an electronic machine that accepts data, processes it by following instructions, stores the results and gives us useful information as output. The four main steps are input, processing, storage and output. Computers work very fast and never get tired, but they cannot think on their own."],
+    ["Basics", "Data and information", "Data is a collection of raw facts such as numbers, letters and symbols. When data is processed and organised so that it has meaning, it becomes information. For example, the marks of students are data, while a ranked list of toppers made from those marks is information."],
+    ["Basics", "Generations of computers", "Computers have developed through five generations. The first used vacuum tubes, the second used transistors, the third used integrated circuits and the fourth used microprocessors. The fifth generation is based on artificial intelligence. Each generation made computers smaller, faster, cheaper and more reliable than before."],
+    ["Basics", "The binary system", "Computers understand only two digits, 0 and 1, which is called the binary number system. Each 0 or 1 is called a bit. Eight bits make one byte. For example, the decimal number 5 is written as 101 in binary, and 10 is written as 1010."],
+    ["Basics", "Units of memory", "Computer memory is measured in bytes. One byte has 8 bits. One kilobyte is 1024 bytes, one megabyte is 1024 kilobytes and one gigabyte is 1024 megabytes. Next comes the terabyte, which is 1024 gigabytes. A short text file is a few kilobytes, while a movie can be several gigabytes."],
+
+    ["Hardware", "What is hardware?", "Hardware means the physical parts of a computer that we can see and touch, such as the monitor, keyboard, mouse, system unit and printer. Hardware cannot do any useful work without software, which gives it instructions."],
+    ["Hardware", "Input devices", "Input devices send data and commands into the computer. The keyboard, mouse, scanner, microphone, webcam and touch screen are common input devices. A barcode reader is also an input device, and it is used in shops to read the price of goods quickly."],
+    ["Hardware", "Output devices", "Output devices show the results of processing to the user. A monitor displays text and pictures, a printer prints them on paper and speakers play sound. The output shown on a screen is called soft copy, and the output printed on paper is called hard copy."],
+    ["Hardware", "The CPU", "The CPU, or central processing unit, is the brain of the computer. It carries out instructions and controls all other parts. It has two main parts: the control unit, which directs the work, and the arithmetic logic unit, which does calculations and makes comparisons. The speed of a CPU is measured in gigahertz."],
+    ["Hardware", "RAM and ROM", "RAM is the main memory of a computer. It stores data and programs temporarily while the computer is working, and its contents are lost when the power is switched off. ROM stores important start-up instructions permanently, so its contents remain even when the computer is off."],
+    ["Hardware", "Storage devices", "Storage devices keep data permanently so that we can use it later. A hard disk and a solid state drive are storage devices inside the computer. A pen drive and a memory card are portable storage devices. Always remove a pen drive safely to avoid losing your files."],
+
+    ["Software", "Types of software", "Software is a set of instructions that tells the hardware what to do. System software, such as an operating system, controls the computer. Application software, such as a word processor or a game, helps the user do a specific task. Utility software, such as an antivirus, keeps the computer clean and safe."],
+    ["Software", "The operating system", "An operating system manages the hardware and software of a computer and lets the user interact with it. It runs programs, manages files and controls input and output. Windows, Linux and macOS are operating systems for computers, while Android and iOS are made for mobile phones."],
+    ["Software", "Files and folders", "A file stores data such as a document, picture or song. A folder is a container used to keep files organised. Every file has a name and an extension, such as .docx for a Word document, .txt for a text file and .jpg for a picture. Give files clear names so that they are easy to find."],
+
+    ["Internet and safety", "The Internet", "The Internet is a worldwide network of connected computers that share information. The World Wide Web is a collection of web pages stored on web servers, and we open them using a web browser such as Chrome or Firefox. Every web page has an address called a URL. The country code for Nepal is .np."],
+    ["Internet and safety", "Searching wisely", "A search engine helps us find information on the Internet by using keywords. Not everything online is true, so always check the source. Prefer official, educational and well-known websites, compare two or three sources, and write information in your own words instead of copying it."],
+    ["Internet and safety", "Email basics", "Email is a fast way to send messages over the Internet. An email address has a user name, the at sign and a domain name. In the To box we write the receiver, in Cc we send a copy to others, and in Bcc the extra receivers stay hidden. Always write a clear subject and be polite."],
+    ["Internet and safety", "Strong passwords", "A strong password is long and mixes capital letters, small letters, numbers and symbols. Do not use your name or birthday, and never share your password with anyone. Use a different password for each account, and log out when you finish using a shared computer."],
+    ["Internet and safety", "Viruses and antivirus", "A computer virus is a harmful program that can damage files and spread from one computer to another. Viruses often come through unknown emails, pirated software and infected pen drives. Install an antivirus program, keep it updated, and take regular backups of important files."],
+    ["Internet and safety", "Phishing", "Phishing is a trick in which fake messages or websites pretend to be real ones to steal your passwords or money. Do not click unknown links or open strange attachments. Never share personal details with strangers online, and tell a teacher or parent if something online makes you uncomfortable."],
+    ["Internet and safety", "Cyber ethics", "Cyber ethics means using computers and the Internet in a responsible way. Do not copy other people's work and call it your own, which is called plagiarism. Respect copyright, do not spread rumours, and never bully anyone online. Be kind and think before you post."],
+    ["Internet and safety", "Computer networks", "A network is a group of computers connected to share data and resources such as printers. A LAN, or local area network, covers a small area like a school computer lab. A WAN, or wide area network, covers a large area such as many cities or countries. The Internet is the largest WAN."],
+
+    ["Office tools", "Keyboard shortcuts", "Keyboard shortcuts save time. Press Ctrl and C to copy, Ctrl and X to cut and Ctrl and V to paste. Ctrl and Z undoes the last action, Ctrl and S saves your file, Ctrl and A selects everything and Ctrl and P prints. Practise them until your fingers remember them."],
+    ["Office tools", "Word processing", "A word processor such as Microsoft Word is used to write, edit and format documents. You can change the font, size and colour of text, make it bold, italic or underlined, and align it left, center or right. Save your work often, and use spell check to find mistakes."],
+    ["Office tools", "Spreadsheets", "A spreadsheet is made of rows and columns. The box where a row and a column meet is called a cell, and its address looks like B3. A formula always begins with the equal sign. For example, =SUM(A1:A5) adds all the numbers from cell A1 to cell A5."],
+    ["Office tools", "Presentations", "A presentation program such as PowerPoint is used to make slides. Keep each slide simple, use short points instead of long paragraphs, and choose readable fonts and colours. Add pictures only when they explain the topic, and practise speaking before you present."],
+    ["Office tools", "Databases", "A database is an organised collection of data. It stores data in tables made of rows and columns. Each row is called a record and each column is called a field. A school can keep the names, roll numbers and marks of students in a database so that searching and sorting are easy."],
+
+    ["Logic and coding", "Algorithms", "An algorithm is a step by step set of instructions to solve a problem. A good algorithm is clear, finite and in the correct order. For example, the steps to make tea or to find the largest of three numbers are algorithms. We can draw an algorithm as a flowchart."],
+    ["Logic and coding", "Flowcharts", "A flowchart shows an algorithm using symbols joined by arrows. An oval marks the start and the end, a parallelogram shows input or output, a rectangle shows a process or calculation, and a diamond shows a decision with yes or no answers. The arrows show the direction of the flow."],
+    ["Logic and coding", "Programming", "A program is a set of instructions written in a programming language such as Python, Scratch or C. Computers understand only machine language, so a translator is needed. A compiler translates the whole program at once, while an interpreter translates it line by line. Finding and fixing errors is called debugging."],
+    ["Logic and coding", "Variables", "A variable is a named place in memory that stores a value which can change. In Python, the line age = 12 stores the number 12 in a variable called age. A good variable name is short, meaningful and does not contain spaces."],
+
+    ["Typing and health", "Touch typing", "In touch typing, you place your fingers on the home row and type without looking at the keys. Your left fingers rest on A, S, D and F, and your right fingers rest on J, K, L and the semicolon key. Your thumbs rest on the space bar. Small bumps on F and J help you find the place. Accuracy comes first, and speed will follow."],
+    ["Typing and health", "Sitting posture", "Sit straight with your feet flat on the floor and your back supported. Keep the screen at eye level, about an arm's length away, and keep your wrists straight while typing. Take a short break every 30 minutes to stand up and stretch."],
+    ["Typing and health", "Caring for your eyes", "Looking at a screen for a long time tires the eyes. Follow the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds. Keep the room well lit, avoid glare on the screen, and blink often."]
+  ];
+
+  var AMOUNTS = { time: [15, 30, 60, 120], words: [10, 25, 50, 100] };
+  var WORDLIST = ('the be of and a to in he have it that for they with as not on she at by this we you do but from or which one would all will there say who make when can more if no man out other so what time up go about than into could state only new year some take come these know see use get like then first any work now may such give over think most even find day also after way many must look before great back through long where much should well people down own just because good each those feel seem how high too place little world very still nation hand old life tell write become here show house both between need mean call develop under last right move thing general school never same another begin while number part turn real leave might want point form off child few small since against ask late home interest large person end open public follow during present without again hold govern around possible head consider word program problem however lead system set order eye plan run keep face fact group play stand increase early course change help').split(' ');
+
+  /* ---------- tiny helpers that work in every browser ---------- */
+  function $(id) { return document.getElementById(id); }
+  function on(el, type, fn) { if (el.addEventListener) { el.addEventListener(type, fn, false); } else { el.attachEvent('on' + type, fn); } }
+  function cancel(e) { if (e.preventDefault) { e.preventDefault(); } else { e.returnValue = false; } }
+  function setText(el, s) { if ('textContent' in el) { el.textContent = s; } else { el.innerText = s; } }
+  function getText(el) { return ('textContent' in el) ? el.textContent : el.innerText; }
+  function now() { return new Date().getTime(); }
+  function inArray(a, v) { var i; for (i = 0; i < a.length; i++) { if (a[i] === v) { return true; } } return false; }
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function rnd(n) { return Math.floor(Math.random() * n); }
+  function hidden(el, yes) { el.className = yes ? 'hide' : ''; }
+  function blurIt(el) { if (el && el.blur) { try { el.blur(); } catch (e) {} } }
+  function targetOf(e) { return e.target || e.srcElement; }
+  function cleanName(s) {
+    s = String(s === undefined || s === null ? '' : s).replace(/[\x00-\x1f<>|;,]/g, '').replace(/\s+/g, ' ').replace(/^ | $/g, '');
+    return s.substring(0, 20);
+  }
+
+  /* ---------- saving: localStorage, else IE userData, else memory only ---------- */
+  var store = (function () {
+    var mem = {}, kind = 'mem', ud = null, d;
+    try {
+      if (window.localStorage) {
+        window.localStorage.setItem('ff_probe', '1');
+        window.localStorage.removeItem('ff_probe');
+        kind = 'ls';
+      }
+    } catch (e1) { kind = 'mem'; }
+    if (kind === 'mem') {
+      try {
+        d = document.createElement('div');
+        d.style.behavior = 'url(#default#userData)';
+        d.style.position = 'absolute';
+        d.style.left = '-9999px';
+        document.body.appendChild(d);
+        if (d.load && d.save) { ud = d; kind = 'ud'; }
+      } catch (e2) { kind = 'mem'; }
+    }
+    return {
+      get: function (k) {
+        try {
+          if (kind === 'ls') { return window.localStorage.getItem(k); }
+          if (kind === 'ud') { ud.load('ffstore'); return ud.getAttribute(k); }
+        } catch (e) {}
+        return mem[k] === undefined ? null : mem[k];
+      },
+      set: function (k, v) {
+        mem[k] = v;
+        try {
+          if (kind === 'ls') { window.localStorage.setItem(k, v); }
+          else if (kind === 'ud') { ud.setAttribute(k, v); ud.save('ffstore'); }
+        } catch (e) {}
+      },
+      del: function (k) {
+        delete mem[k];
+        try {
+          if (kind === 'ls') { window.localStorage.removeItem(k); }
+          else if (kind === 'ud') { ud.removeAttribute(k); ud.save('ffstore'); }
+        } catch (e) {}
+      }
+    };
+  })();
+
+  /* ---------- settings, player, high scores (plain strings, no JSON) ---------- */
+  var S = { mode: 'time', amount: 30, topic: 'all' };
+  (function () {
+    var raw = store.get('ff_settings'), p, n;
+    if (raw) {
+      p = String(raw).split(',');
+      if (p.length >= 3) {
+        n = parseInt(p[1], 10);
+        S.mode = p[0]; S.amount = isNaN(n) ? 30 : n; S.topic = p[2];
+      }
+    }
+    if (S.mode !== 'time' && S.mode !== 'words' && S.mode !== 'notes') { S.mode = 'time'; }
+    if (AMOUNTS[S.mode] && !inArray(AMOUNTS[S.mode], S.amount)) { S.amount = AMOUNTS[S.mode][1]; }
+    if (S.topic !== 'all' && !inArray(NOTE_CATS, S.topic)) { S.topic = 'all'; }
+  })();
+  function saveSettings() { store.set('ff_settings', S.mode + ',' + S.amount + ',' + S.topic); }
+
+  var player = cleanName(store.get('ff_player'));
+  function showPlayer() { setText($('pName'), player || 'guest'); }
+  function setPlayer(n) { player = cleanName(n); store.set('ff_player', player); showPlayer(); }
+
+  function today() {
+    var d = new Date(), m = d.getMonth() + 1, dd = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd;
+  }
+  function readBest() {
+    var raw = store.get('ff_best') || '', out = {}, parts, i, f, w;
+    parts = raw ? String(raw).split(';') : [];
+    for (i = 0; i < parts.length; i++) {
+      f = parts[i].split('|');
+      w = parseInt(f[1], 10);
+      if (f.length >= 2 && !isNaN(w)) { out[f[0]] = { w: w, n: cleanName(f[2] || ''), d: f[3] || '' }; }
+    }
+    return out;
+  }
+  function writeBest(o) {
+    var s = [], k;
+    for (k in o) { if (o.hasOwnProperty(k)) { s.push(k + '|' + o[k].w + '|' + o[k].n + '|' + o[k].d); } }
+    store.set('ff_best', s.join(';'));
+  }
+
+  /* ---------- state ---------- */
+  var words = [], typed = [], wordEls = [], curNote = null, bag = [], bagKey = '';
+  var cur = 0, started = false, finished = false, startTime = 0, timer = null, finishedAt = 0, lastSec = -1;
+  var keyTotal = 0, keyCorrect = 0, resultShown = false, scoresOpen = false, warnTimer = null;
+  var lastBestKey = null, lastBestWpm = 0, clearArmed = false;
+  var box = $('box'), wordsEl = $('words');
+
+  /* ---------- words and notes ---------- */
+  function genWords(n) {
+    var out = [], i;
+    for (i = 0; i < n; i++) { out.push(WORDLIST[rnd(WORDLIST.length)]); }
+    return out;
+  }
+
+  /* every note is shown once, in random order, before any repeats */
+  function pickNote() {
+    var i, j, t;
+    if (bagKey !== S.topic || bag.length === 0) {
+      bagKey = S.topic; bag = [];
+      for (i = 0; i < NOTES.length; i++) { if (S.topic === 'all' || NOTES[i][0] === S.topic) { bag.push(i); } }
+      for (i = bag.length - 1; i > 0; i--) { j = rnd(i + 1); t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+    }
+    return NOTES[bag.pop()];
+  }
+
+  /* ---------- drawing the words ---------- */
+  function wordHtml(i) {
+    var w = words[i], t = typed[i], h = '', j, n = t.length;
+    if (i > cur && n === 0) { return esc(w); }
+    for (j = 0; j < w.length && j < n; j++) {
+      h += '<span class="' + (t.charAt(j) === w.charAt(j) ? 'c' : 'x') + '">' + esc(w.charAt(j)) + '</span>';
+    }
+    if (n < w.length) {
+      if (i === cur) { h += '<span class="cl">' + esc(w.charAt(n)) + '</span>' + esc(w.substring(n + 1)); }
+      else { h += esc(w.substring(n)); }
+    }
+    for (j = w.length; j < n; j++) { h += '<span class="e">' + esc(t.charAt(j)) + '</span>'; }
+    return h;
+  }
+
+  function renderWord(i) {
+    var el = wordEls[i], cls = 'w';
+    if (!el) { return; }
+    el.innerHTML = wordHtml(i);
+    if (i === cur) { cls += ' cw'; }
+    if (i < cur && typed[i] !== words[i]) { cls += ' bad'; }
+    el.className = cls;
+  }
+
+  function buildWords() {
+    var h = [], i;
+    for (i = 0; i < words.length; i++) { h.push('<span id="w' + i + '" class="w">' + esc(words[i]) + '</span> '); }
+    wordsEl.innerHTML = h.join('');
+    wordEls = [];
+    for (i = 0; i < words.length; i++) { wordEls.push($('w' + i)); }
+    box.scrollTop = 0;
+    renderWord(0);
+  }
+
+  /* keep the word being typed on the second of three visible lines */
+  function updateScroll() {
+    var el = wordEls[cur], lh = box.clientHeight / 3, row, target;
+    if (!el || !wordEls[0] || !lh) { return; }
+    row = Math.round((el.offsetTop - wordEls[0].offsetTop) / lh);
+    target = row > 1 ? Math.round((row - 1) * lh) : 0;
+    if (box.scrollTop !== target) { box.scrollTop = target; }
+  }
+
+  function warn(msg) {
+    setText($('warn'), msg);
+    if (warnTimer) { clearTimeout(warnTimer); warnTimer = null; }
+    if (msg) { warnTimer = setTimeout(function () { setText($('warn'), ''); }, 5000); }
+  }
+
+  /* ---------- the test ---------- */
+  function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+
+  function newTest(same) {
+    var i, nt = $('noteTitle');
+    stopTimer();
+    started = false; finished = false; resultShown = false;
+    cur = 0; keyTotal = 0; keyCorrect = 0; lastSec = -1;
+    warn('');
+    if (!same || words.length === 0) {
+      curNote = null;
+      if (S.mode === 'notes') { curNote = pickNote(); words = curNote[2].split(' '); }
+      else { words = genWords(S.mode === 'words' ? S.amount : S.amount * 4); }
+    }
+    typed = [];
+    for (i = 0; i < words.length; i++) { typed.push(''); }
+    if (S.mode === 'notes' && curNote) { setText(nt, curNote[0] + ': ' + curNote[1]); hidden(nt, false); }
+    else { setText(nt, ''); hidden(nt, true); }
+    hidden($('res'), true);
+    hidden($('scores'), true);
+    hidden($('test'), false);
+    $('live').style.visibility = 'hidden';
+    buildWords();
+    updateScroll();
+  }
+
+  function start() {
+    started = true;
+    startTime = now();
+    $('live').style.visibility = 'visible';
+    timer = setInterval(tick, 200);
+    updateLive(0);
+  }
+
+  function tick() {
+    var el = (now() - startTime) / 1000, sec;
+    if (S.mode === 'time' && el >= S.amount) { finish(); return; }
+    sec = Math.floor(el);
+    if (sec !== lastSec) { lastSec = sec; updateLive(el); }
+  }
+
+  function updateLive(el) {
+    var st = stats(el < 1 ? 1 : el);
+    setText($('liveA'), S.mode === 'time' ? String(Math.max(0, S.amount - Math.floor(el))) : cur + '/' + words.length);
+    setText($('liveB'), Math.round(st.wpm) + ' wpm');
+  }
+
+  function stats(sec) {
+    var correct = 0, total = 0, i, t, w, mins = sec / 60;
+    for (i = 0; i <= cur && i < words.length; i++) {
+      t = typed[i]; w = words[i];
+      if (i < cur) {
+        if (t === w) { correct += w.length + 1; }
+        total += t.length + 1;
+      } else {
+        total += t.length;
+        if (t.length > 0 && t === w.substring(0, t.length)) { correct += t.length; }
+      }
+    }
+    return { wpm: mins > 0 ? correct / 5 / mins : 0, raw: mins > 0 ? total / 5 / mins : 0 };
+  }
+
+  function finish() {
+    var elapsed, st, c = 0, x = 0, e = 0, m = 0, i, j, t, w, lim, acc, wpm;
+    var msg = '', ask = false, key, all, prevE, prev, rc;
+    if (finished) { return; }
+    finished = true;
+    stopTimer();
+
+    elapsed = S.mode === 'time' ? S.amount : (now() - startTime) / 1000;
+    if (elapsed < 0.5) { elapsed = 0.5; }
+    st = stats(elapsed);
+    for (i = 0; i <= cur && i < words.length; i++) {
+      t = typed[i]; w = words[i];
+      lim = Math.min(t.length, w.length);
+      for (j = 0; j < lim; j++) { if (t.charAt(j) === w.charAt(j)) { c++; } else { x++; } }
+      if (t.length > w.length) { e += t.length - w.length; }
+      if (t.length < w.length && i < cur) { m += w.length - t.length; }
+    }
+    acc = keyTotal ? Math.round(100 * keyCorrect / keyTotal) : 0;
+    wpm = Math.round(st.wpm);
+
+    setText($('rWpm'), String(wpm));
+    setText($('rAcc'), acc + '%');
+    setText($('rRaw'), String(Math.round(st.raw)));
+    setText($('rChars'), c + ' / ' + x + ' / ' + e + ' / ' + m);
+    setText($('rTime'), (Math.round(elapsed * 10) / 10) + 's');
+    setText($('rMode'), S.mode === 'time' ? S.amount + ' seconds' : S.mode === 'words' ? S.amount + ' words' : 'notes');
+
+    /* the score is saved at once; the name is asked for only after a new high score */
+    lastBestKey = null; lastBestWpm = 0;
+    if (S.mode === 'time' || S.mode === 'words') {
+      key = S.mode + ':' + S.amount;
+      all = readBest(); prevE = all[key]; prev = prevE ? prevE.w : 0;
+      if (wpm > 0 && wpm > prev) {
+        all[key] = { w: wpm, n: player, d: today() };
+        writeBest(all);
+        lastBestKey = key; lastBestWpm = wpm; ask = true;
+        msg = prev ? 'New high score for this test: ' + wpm + ' wpm (was ' + prev + ').' : 'First high score for this test: ' + wpm + ' wpm.';
+      } else if (prev) {
+        msg = 'High score for this test: ' + prev + ' wpm' + (prevE.n ? ' by ' + prevE.n : '') + '.';
+      }
+    }
+    setText($('best'), msg);
+    $('nameIn').value = player;
+    hidden($('nameBox'), !ask);
+
+    rc = $('recap');
+    if (S.mode === 'notes' && curNote) {
+      setText($('recapTitle'), curNote[0] + ': ' + curNote[1]);
+      setText($('recapText'), curNote[2]);
+      hidden(rc, false);
+    } else { hidden(rc, true); }
+
+    hidden($('test'), true);
+    hidden($('res'), false);
+    resultShown = true;
+    finishedAt = now();
+  }
+
+  function saveResultName() {
+    var v = cleanName($('nameIn').value), all;
+    if (v) {
+      setPlayer(v);
+      if (lastBestKey) {
+        all = readBest();
+        if (all[lastBestKey] && all[lastBestKey].w === lastBestWpm) { all[lastBestKey].n = v; writeBest(all); }
+        setText($('best'), 'Saved: ' + lastBestWpm + ' wpm by ' + v + '.');
+      }
+    }
+    hidden($('nameBox'), true);
+  }
+
+  /* ---------- typing ---------- */
+  function typeChar(ch) {
+    var w = words[cur], t = typed[cur];
+    if (finished) { return; }
+    if (!started) { start(); }
+    if (t.length >= w.length + 10) { return; }
+    keyTotal++;
+    if (t.length < w.length && ch === w.charAt(t.length)) { keyCorrect++; }
+    typed[cur] = t + ch;
+    renderWord(cur);
+    if (S.mode !== 'time' && cur === words.length - 1 && typed[cur].length >= w.length) { finish(); }
+  }
+
+  function pressSpace() {
+    if (finished || typed[cur] === '') { return; }
+    keyTotal++;
+    if (typed[cur] === words[cur]) { keyCorrect++; }
+    cur++;
+    renderWord(cur - 1);
+    if (cur >= words.length) { cur = words.length - 1; finish(); return; }
+    renderWord(cur);
+    updateScroll();
+    if (S.mode !== 'time') { updateLive((now() - startTime) / 1000); }
+  }
+
+  /* Backspace deletes a letter. Ctrl (or Alt) + Backspace deletes the whole word.
+     On an empty word both step back into the previous word. */
+  function backspace(wholeWord) {
+    if (finished || !started) { return; }
+    if (typed[cur] === '') {
+      if (cur === 0) { return; }
+      cur--;
+      renderWord(cur + 1);
+      if (wholeWord) { typed[cur] = ''; }
+    } else if (wholeWord) {
+      typed[cur] = '';
+    } else {
+      typed[cur] = typed[cur].substring(0, typed[cur].length - 1);
+    }
+    renderWord(cur);
+    updateScroll();
+  }
+
+  function isTextBox(e) {
+    var t = targetOf(e), tag = t && t.tagName ? String(t.tagName).toUpperCase() : '';
+    return tag === 'INPUT' || tag === 'TEXTAREA';
+  }
+
+  on(document, 'keydown', function (e) {
+    var k;
+    e = e || window.event;
+    if (isTextBox(e)) { return; }
+    k = e.keyCode;
+    if (scoresOpen) { if (k === 27) { cancel(e); closeScores(); } return; }
+    if (resultShown) {
+      /* ignore keys for a moment so a late space or enter from typing does not skip the results */
+      if (k === 9 || k === 13 || k === 27 || k === 32) { cancel(e); }
+      if (now() - finishedAt > 600) {
+        if (k === 9 || k === 13) { newTest(false); }
+        else if (k === 27) { newTest(true); }
+      }
+      return;
+    }
+    if (k === 9) { cancel(e); newTest(false); return; }
+    if (k === 27) { cancel(e); newTest(true); return; }
+    if (k === 8) { cancel(e); backspace(!!(e.ctrlKey || e.altKey || e.metaKey)); return; }
+  });
+
+  on(document, 'keypress', function (e) {
+    var code, ch;
+    e = e || window.event;
+    if (isTextBox(e)) { return; }
+    if (scoresOpen) { return; }
+    if (resultShown) { if (!(e.ctrlKey || e.altKey || e.metaKey)) { cancel(e); } return; }
+    if (e.ctrlKey || e.altKey || e.metaKey) { return; }
+    code = (e.which !== undefined && e.which !== null) ? e.which : e.keyCode;
+    if (!code || code < 32) { return; }
+    cancel(e);
+    if (code === 32) { pressSpace(); return; }
+    ch = String.fromCharCode(code);
+    if (code > 127) { warn('This keyboard is not typing English letters. Press Alt + Shift to switch to English.'); }
+    else if (ch >= 'A' && ch <= 'Z' && !e.shiftKey) { warn('Caps Lock is on.'); }
+    typeChar(ch);
+  });
+
+  /* ---------- settings bar ---------- */
+  function refreshCfg() {
+    var ids = ['time', 'words', 'notes'], i, b, list = AMOUNTS[S.mode], h = '', sel = $('topic'), am = $('amounts');
+    for (i = 0; i < ids.length; i++) { $('m_' + ids[i]).className = 'opt' + (S.mode === ids[i] ? ' on' : ''); }
+    if (list) {
+      for (i = 0; i < list.length; i++) {
+        h += '<button type="button" class="opt' + (S.amount === list[i] ? ' on' : '') + '" id="a_' + list[i] + '">' + list[i] + '</button>';
+      }
+      am.innerHTML = h;
+      hidden(am, false);
+      sel.className = 'hide';
+    } else {
+      am.innerHTML = '';
+      hidden(am, true);
+      sel.className = '';
+      for (i = 0; i < sel.options.length; i++) { if (sel.options[i].value === S.topic) { sel.selectedIndex = i; } }
+    }
+  }
+
+  function chooseMode(m) {
+    S.mode = m;
+    if (AMOUNTS[m] && !inArray(AMOUNTS[m], S.amount)) { S.amount = AMOUNTS[m][1]; }
+    saveSettings(); refreshCfg(); newTest(false);
+  }
+  on($('m_time'), 'click', function () { blurIt($('m_time')); chooseMode('time'); });
+  on($('m_words'), 'click', function () { blurIt($('m_words')); chooseMode('words'); });
+  on($('m_notes'), 'click', function () { blurIt($('m_notes')); chooseMode('notes'); });
+
+  on($('amounts'), 'click', function (e) {
+    var t, id, n;
+    e = e || window.event;
+    t = targetOf(e);
+    id = t && t.id ? String(t.id) : '';
+    if (id.substring(0, 2) !== 'a_') { return; }
+    n = parseInt(id.substring(2), 10);
+    blurIt(t);
+    if (isNaN(n)) { return; }
+    S.amount = n; saveSettings(); refreshCfg(); newTest(false);
+  });
+
+  (function () {
+    var sel = $('topic'), i;
+    sel.options[0] = new Option('All topics', 'all');
+    for (i = 0; i < NOTE_CATS.length; i++) { sel.options[i + 1] = new Option(NOTE_CATS[i], NOTE_CATS[i]); }
+    on(sel, 'change', function () {
+      S.topic = sel.options[sel.selectedIndex].value;
+      blurIt(sel); saveSettings(); newTest(false);
+    });
+  })();
+
+  on($('btnNext'), 'click', function () { blurIt($('btnNext')); newTest(false); });
+  on($('btnRetry'), 'click', function () { blurIt($('btnRetry')); newTest(true); });
+
+  /* ---------- player name ---------- */
+  on($('pChg'), 'click', function (e) {
+    e = e || window.event; cancel(e);
+    blurIt($('pChg'));
+    $('pIn').value = player;
+    hidden($('pEditRow'), false);
+    try { $('pIn').focus(); $('pIn').select(); } catch (err) {}
+  });
+  function savePlayerEdit() { setPlayer($('pIn').value); hidden($('pEditRow'), true); blurIt($('pIn')); }
+  on($('pOk'), 'click', function () { savePlayerEdit(); });
+  on($('pIn'), 'keydown', function (e) { e = e || window.event; if (e.keyCode === 13) { cancel(e); savePlayerEdit(); } else if (e.keyCode === 27) { hidden($('pEditRow'), true); blurIt($('pIn')); } });
+  on($('nameSave'), 'click', function () { saveResultName(); });
+  on($('nameIn'), 'keydown', function (e) { e = e || window.event; if (e.keyCode === 13) { cancel(e); saveResultName(); } });
+
+  /* ---------- high score list ---------- */
+  function buildScores() {
+    var all = readBest(), rows = $('scoreRows'), modes = ['time', 'words'], m, i, list, key, e, row, label, found = false, txt;
+    rows.innerHTML = '';
+    clearArmed = false;
+    setText($('scoreClear'), 'Clear all scores');
+    for (m = 0; m < modes.length; m++) {
+      list = AMOUNTS[modes[m]];
+      for (i = 0; i < list.length; i++) {
+        key = modes[m] + ':' + list[i];
+        e = all[key];
+        if (!e) { continue; }
+        found = true;
+        row = document.createElement('div');
+        row.className = 'row';
+        label = document.createElement('span');
+        setText(label, list[i] + (modes[m] === 'time' ? ' seconds' : ' words') + ':  ');
+        row.appendChild(label);
+        label = document.createElement('b');
+        setText(label, e.w + ' wpm');
+        row.appendChild(label);
+        label = document.createElement('span');
+        setText(label, '   ' + (e.n || 'no name') + (e.d ? ', ' + e.d : ''));
+        row.appendChild(label);
+        rows.appendChild(row);
+      }
+    }
+    if (!found) {
+      row = document.createElement('div');
+      setText(row, 'No scores yet. Finish a time or words test to set your first one.');
+      rows.appendChild(row);
+    }
+    $('scoreClear').className = 'btn' + (found ? '' : ' hide');
+  }
+  function openScores() {
+    stopTimer(); started = false; scoresOpen = true;
+    buildScores();
+    hidden($('test'), true); hidden($('res'), true); hidden($('scores'), false);
+    resultShown = false;
+  }
+  function closeScores() { scoresOpen = false; newTest(false); }
+  on($('scoreLnk'), 'click', function (e) { e = e || window.event; cancel(e); blurIt($('scoreLnk')); openScores(); });
+  on($('scoreClose'), 'click', function () { blurIt($('scoreClose')); closeScores(); });
+  on($('scoreClear'), 'click', function () {
+    blurIt($('scoreClear'));
+    if (!clearArmed) { clearArmed = true; setText($('scoreClear'), 'Click again to erase all scores'); return; }
+    store.del('ff_best');
+    buildScores();
+  });
+
+  /* ---------- go ---------- */
+  showPlayer();
+  refreshCfg();
+  newTest(false);
+})();
+</script>
+</body>
+</html>
